@@ -1,53 +1,12 @@
-import pyttsx3
-import queue
-import sounddevice as sd
-import vosk
-import sys
-import json
-from zarn_api import ask_axis
+import speech_recognition as sr import pyttsx3 from video_viewer import handle_voice_command
 
-q = queue.Queue()
-model = vosk.Model("model")  # Download Vosk model and place in /model
-engine = pyttsx3.init()
+engine = pyttsx3.init() recognizer = sr.Recognizer()
 
-def speak(text):
-    print("ZARN:", text)
-    engine.say(text)
-    engine.runAndWait()
+def speak(text): print("[ZARN]:", text) engine.say(text) engine.runAndWait()
 
-def callback(indata, frames, time, status):
-    if status:
-        print(status, file=sys.stderr)
-    q.put(bytes(indata))
+def listen(): with sr.Microphone() as source: print("[ZARN]: Listening...") audio = recognizer.listen(source) try: command = recognizer.recognize_google(audio) print("[You]:", command) return command except sr.UnknownValueError: speak("Sorry, I didn't catch that.") except sr.RequestError as e: speak("Speech recognition service is unavailable.") return ""
 
-def listen():
-    with sd.RawInputStream(samplerate=16000, blocksize=8000, dtype='int16',
-                           channels=1, callback=callback):
-        rec = vosk.KaldiRecognizer(model, 16000)
-        print("Listening... Say 'ZARN' to wake up.")
-        while True:
-            data = q.get()
-            if rec.AcceptWaveform(data):
-                result = json.loads(rec.Result())
-                text = result.get("text", "")
-                if "zarn" in text.lower():
-                    speak("Yes?")
-                    return capture_command()
+def handle_command(command): response = handle_voice_command(command) if response: speak(response) else: speak("I'm not sure how to handle that yet.")
 
-def capture_command():
-    with sd.RawInputStream(samplerate=16000, blocksize=8000, dtype='int16',
-                           channels=1, callback=callback):
-        rec = vosk.KaldiRecognizer(model, 16000)
-        print("Listening for command...")
-        while True:
-            data = q.get()
-            if rec.AcceptWaveform(data):
-                result = json.loads(rec.Result())
-                command = result.get("text", "")
-                return command
+if name == 'main': while True: voice_input = listen() if voice_input: handle_command(voice_input)
 
-if __name__ == "__main__":
-    while True:
-        user_input = listen()
-        reply = ask_axis(user_input)
-        speak(reply)
