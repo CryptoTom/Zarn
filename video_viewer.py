@@ -42,11 +42,11 @@ except Exception as e:
 
 Voice trigger integration
 
-def handle_voice_command(command): if "show me" in command.lower() or "play" in command.lower(): time_part = command.lower().split("show me")[-1] if "show me" in command.lower() else command.lower().split("play")[-1] return show_clip_from_time(time_part.strip()) return None
+def handle_voice_command(command): if any(trigger in command.lower() for trigger in ["show me", "play", "open clip"]): parts = command.lower().split("show me") if "show me" in command.lower() else 
+command.lower().split("play") if "play" in command.lower() else 
+command.lower().split("open clip") if len(parts) > 1: return show_clip_from_time(parts[1].strip()) return None
 
-Example:
+Hook for voice_core integration
 
-response = handle_voice_command("Zarn, show me 5:00 PM yesterday")
-
-print(response)
+if name == 'main': while True: cmd = input("ZARN (voice sim): ") print(handle_voice_command(cmd))
 
