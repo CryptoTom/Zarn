@@ -19,7 +19,6 @@ if "yesterday" in query_time.lower():
 else:
     base_date = now
 
-# Try to extract time like "5:00 PM" or "17:00"
 try:
     raw_time = query_time.lower().replace("am", " am").replace("pm", " pm").replace(":", ":00")
     target_time = datetime.datetime.strptime(raw_time.strip(), "%I:%M %p")
@@ -41,7 +40,13 @@ try:
 except Exception as e:
     return f"Failed to play video: {e}"
 
+Voice trigger integration
+
+def handle_voice_command(command): if "show me" in command.lower() or "play" in command.lower(): time_part = command.lower().split("show me")[-1] if "show me" in command.lower() else command.lower().split("play")[-1] return show_clip_from_time(time_part.strip()) return None
+
 Example:
 
-print(show_clip_from_time("5:00 PM yesterday"))
+response = handle_voice_command("Zarn, show me 5:00 PM yesterday")
+
+print(response)
 
