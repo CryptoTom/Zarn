@@ -1,17 +1,23 @@
 import serial
 import time
 import os
+from usb_manager import find_flipper_port
 
-FLIPPER_PORT = "/dev/ttyACM0"  # You may need to adjust if using /ttyUSB0
 BAUD_RATE = 115200
 TIMEOUT = 2
 
 class FlipperBridge:
-    def __init__(self, port=FLIPPER_PORT, baud=BAUD_RATE):
+    def __init__(self, baud=BAUD_RATE):
+        port = find_flipper_port()
+        if not port:
+            print("[ZARN] Flipper not detected.")
+            self.ser = None
+            return
+
         try:
             self.ser = serial.Serial(port, baudrate=baud, timeout=TIMEOUT)
             time.sleep(1.5)
-            print("[ZARN] Connected to Flipper Zero.")
+            print(f"[ZARN] Connected to Flipper on {port}")
         except Exception as e:
             print(f"[ZARN] Failed to connect to Flipper: {e}")
             self.ser = None
