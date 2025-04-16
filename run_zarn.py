@@ -6,7 +6,7 @@ import json
 with open("zarn_secrets.json") as f:
     secrets = json.load(f)
 
-zarn = Zarn(api_key=secrets["openai_api_key"])
+zarn = Zarn(api_key=secrets["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"])
 voice = VoiceCore()
 api = ZarnAPI(zarn)
 
