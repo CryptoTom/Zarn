@@ -2,7 +2,6 @@ openai
 flask
 requests
 gpiozero
-picamera
 opencv-python
 numpy
 pyaudio
